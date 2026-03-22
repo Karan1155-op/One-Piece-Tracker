@@ -1,0 +1,29 @@
+{
+  "name": "One Piece Tracker",
+  "short_name": "OP Tracker",
+  "description": "Track your One Piece watching journey — arcs, filler, and the road to Elbaf.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0a0e1a",
+  "background_color": "#0a0e1a",
+  "lang": "en",
+  "categories": ["entertainment", "utilities"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": []
+}
