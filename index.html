@@ -787,7 +787,7 @@
       border-radius: 9px;
       padding:       14px 18px;
       display:       grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: 1fr auto auto auto auto;
       align-items:   center;
       gap:           12px;
       cursor:        pointer;
@@ -812,6 +812,8 @@
     .arc-item.type-canon.completed::before       { background: var(--teal); }
     .arc-item.type-canon.current                 { border-color: rgba(200, 144, 58, .4); background: rgba(200, 144, 58, .06); box-shadow: 0 0 14px rgba(200, 144, 58, .08); }
     .arc-item.type-canon.current::before         { background: var(--gold); }
+    .arc-item.type-canon.unlocked                { border-color: rgba(200, 144, 58, .15); opacity: .75; }
+    .arc-item.type-canon.unlocked::before        { background: rgba(200, 144, 58, .3); }
 
     /* Filler states */
     .arc-item.type-filler                        { border-color: rgba(124, 79, 160, .2); }
@@ -819,6 +821,8 @@
     .arc-item.type-filler.completed::before      { background: var(--purple-light); }
     .arc-item.type-filler.current                { border-color: rgba(160, 108, 200, .5); background: rgba(124, 79, 160, .08); }
     .arc-item.type-filler.current::before        { background: var(--purple-light); }
+    .arc-item.type-filler.unlocked               { border-color: rgba(124, 79, 160, .25); opacity: .75; }
+    .arc-item.type-filler.unlocked::before       { background: rgba(124, 79, 160, .4); }
 
     /* Upcoming */
     .arc-item.type-upcoming                      { border-color: rgba(42, 140, 200, .2); opacity: .6; }
@@ -830,6 +834,7 @@
     .arc-item.type-canon:hover:not(.locked)           { border-color: var(--gold-dim); }
     .arc-item.type-filler:hover:not(.locked)          { border-color: var(--purple); }
     .arc-item.locked:not(.type-upcoming)              { opacity: .38; cursor: default; }
+    .arc-item.unlocked                                { cursor: pointer; }
 
     .arc-meta       { flex: 1; }
 
@@ -861,6 +866,7 @@
     }
 
     .filler-tag   { border: 1px solid var(--purple);      color: var(--purple-light); }
+    .skip-tag     { border: 1px solid rgba(124,79,160,.4); color: var(--text-muted); font-style: italic; }
     .movie-tag    { border: 1px solid var(--amber);       color: var(--amber);        }
     .upcoming-tag { border: 1px solid var(--elbaf-light); color: var(--elbaf-light);  animation: pulse-tag 2s ease-in-out infinite; }
     .ongoing-tag  { border: 1px solid #22c55e;            color: #22c55e;             animation: pulse-tag 2s ease-in-out infinite; }
@@ -1117,7 +1123,7 @@
       border-radius: 9px;
       padding:       14px 18px;
       display:       grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr auto auto auto auto;
       align-items:   center;
       gap:           12px;
       position:      relative;
@@ -1376,6 +1382,77 @@
 
     [data-theme="light"] .dialog {
       box-shadow: 0 16px 48px rgba(0, 0, 0, .2);
+    }
+
+    /* ── Filler Arc Buttons ──────────────────────────────────────────────── */
+    .btn-filler-action {
+      font-family:    'Cinzel Decorative', serif;
+      font-size:      8px;
+      letter-spacing: .07em;
+      padding:        6px 11px;
+      border-radius:  7px;
+      cursor:         pointer;
+      white-space:    nowrap;
+      flex-shrink:    0;
+      transition:     all .2s;
+      border:         none;
+      display:        none;   /* hidden by default — JS controls visibility */
+    }
+
+    /* ✓ Watched — teal */
+    .btn-filler-action.action-watch {
+      border:     1px solid rgba(34, 176, 158, .5);
+      background: transparent;
+      color:      var(--teal-light);
+    }
+    .btn-filler-action.action-watch:hover {
+      background:   rgba(34, 176, 158, .12);
+      border-color: var(--teal-light);
+      transform:    translateY(-1px);
+    }
+
+    /* ⏭ Skip — purple */
+    .btn-filler-action.action-skip {
+      border:     1px solid rgba(124, 79, 160, .5);
+      background: transparent;
+      color:      var(--purple-light);
+    }
+    .btn-filler-action.action-skip:hover {
+      background:   rgba(124, 79, 160, .15);
+      border-color: var(--purple-light);
+      transform:    translateY(-1px);
+    }
+
+    /* ↩ Unwatch — muted teal */
+    .btn-filler-action.action-unwatch {
+      border:     1px solid rgba(34, 176, 158, .3);
+      background: transparent;
+      color:      var(--teal);
+      opacity:    .8;
+    }
+    .btn-filler-action.action-unwatch:hover {
+      background: rgba(34, 176, 158, .08);
+      opacity:    1;
+      transform:  translateY(-1px);
+    }
+
+    /* ↩ Unskip — muted purple */
+    .btn-filler-action.action-unskip {
+      border:     1px solid rgba(124, 79, 160, .3);
+      background: transparent;
+      color:      var(--purple-light);
+      opacity:    .8;
+    }
+    .btn-filler-action.action-unskip:hover {
+      background: rgba(124, 79, 160, .1);
+      opacity:    1;
+      transform:  translateY(-1px);
+    }
+
+    .btn-filler-action:active { transform: translateY(0); }
+
+    @media (max-width: 500px) {
+      .btn-filler-action { font-size: 7px; padding: 5px 7px; }
     }
 
     /* ── Responsive ────────────────────────────────────────────────────────── */
@@ -1746,13 +1823,15 @@ const ELBAF_DATE     = new Date('2026-04-05T00:00:00+09:00'); // JST premiere
 const FALLBACK_TOTAL = 1155;  // used until API responds
 
 const state = {
-  episode:       0,
-  notes:         '',
-  view:          'all',
-  mainView:      'series',   // 'series' | 'movies'
-  totalEps:      FALLBACK_TOTAL,
-  searchQuery:   '',
-  watchedMovies: new Set(),  // Set of movie ids the user has marked watched
+  episode:        0,
+  notes:          '',
+  view:           'all',
+  mainView:       'series',   // 'series' | 'movies'
+  totalEps:       FALLBACK_TOTAL,
+  searchQuery:    '',
+  watchedMovies:   new Set(),  // Set of movie ids marked watched
+  watchedFillers:  new Set(),  // Set of filler arc names explicitly watched
+  skippedFillers:  new Set(),  // Set of filler arc names explicitly skipped
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1770,7 +1849,9 @@ function loadState() {
         state.view         = s.view     || 'all';
         state.mainView     = s.mainView || 'series';
         // watchedMovies is serialised as an array — restore to a Set
-        state.watchedMovies = new Set(Array.isArray(s.watchedMovies) ? s.watchedMovies : []);
+        state.watchedMovies  = new Set(Array.isArray(s.watchedMovies)  ? s.watchedMovies  : []);
+        state.watchedFillers = new Set(Array.isArray(s.watchedFillers) ? s.watchedFillers : []);
+        state.skippedFillers = new Set(Array.isArray(s.skippedFillers) ? s.skippedFillers : []);
       } catch (_) { /* ignore corrupt data */ }
       break;
     }
@@ -1783,7 +1864,10 @@ function saveState() {
     notes:         state.notes,
     view:          state.view,
     mainView:      state.mainView,
-    watchedMovies: Array.from(state.watchedMovies), // Set → array for JSON
+    watchedMovies:  Array.from(state.watchedMovies),
+    watchedFillers:  Array.from(state.watchedFillers),
+    skippedFillers:  Array.from(state.skippedFillers),
+    skippedFillers: Array.from(state.skippedFillers),
   }));
 }
 
@@ -1896,6 +1980,13 @@ function arcStatus(a, ep) {
   if (a.type === 'upcoming') return 'locked';
   if (ep >= arcEnd(a))       return 'completed';
   if (ep >= a.eps[0])        return 'current';
+
+  // Unlocked: previous arc is completed so this one is accessible at 0%
+  // Find the arc that ends just before this one starts
+  const idx  = ARCS.indexOf(a);
+  const prev = idx > 0 ? ARCS[idx - 1] : null;
+  if (prev && prev.type !== 'upcoming' && ep >= arcEnd(prev)) return 'unlocked';
+
   return 'locked';
 }
 
@@ -1986,7 +2077,7 @@ function renderStats() {
   document.getElementById('statWatched').textContent   = ep;
   document.getElementById('statHours').textContent     = hrs >= 1000 ? (Math.round(hrs / 100) / 10) + 'k h' : hrs + 'h';
   document.getElementById('statArcs').textContent      = ARCS.filter(a => a.type === 'canon'  && ep >= arcEnd(a)).length;
-  document.getElementById('statFiller').textContent    = ARCS.filter(a => a.type === 'filler' && ep >= a.eps[1]).length;
+  document.getElementById('statFiller').textContent    = state.watchedFillers.size;
   document.getElementById('statMovies').textContent    = state.watchedMovies.size;
   document.getElementById('statRemaining').textContent = Math.max(0, tot - ep);
 }
@@ -2114,6 +2205,7 @@ function buildArcNode(a, st, pg, key) {
     a.type === 'filler'   ? `<span class="tag-base filler-tag">Filler</span>`            : '',
     a.type === 'upcoming' ? `<span class="tag-base upcoming-tag">⚡ Upcoming</span>`      : '',
     (a.eps[1] === null && a.type === 'canon') ? `<span class="tag-base ongoing-tag">🔴 Ongoing</span>` : '',
+    (a.type === 'filler' && state.skippedFillers.has(a.name)) ? `<span class="tag-base skip-tag">⏭ Skipped</span>` : '',
     a.movie               ? `<span class="tag-base movie-tag">🎬 ${a.movie}</span>`       : '',
   ].join('');
 
@@ -2138,15 +2230,90 @@ function buildArcNode(a, st, pg, key) {
       <div class="arc-pct-label">${pctLabel}</div>
     </div>
     <div class="arc-badge"></div>
+    ${a.type === 'filler' ? '<button class="btn-filler-action" id="filler-btn-a"></button>' : ''}
+    ${a.type === 'filler' ? '<button class="btn-filler-action" id="filler-btn-b"></button>' : ''}
   `;
 
   // Set dynamic parts via patch (keeps the update logic in one place)
   patchArcNode(node, a, st, pg);
 
+  // Configure filler buttons based on current watched/skipped state
+  if (a.type === 'filler') {
+    updateFillerButtons(node, a);
+  }
+
   // Attach click handler
   attachArcClick(node, a);
 
   return node;
+}
+
+/**
+ * updateFillerButtons(node, arc)
+ * Called on every build AND patch so buttons always reflect current state.
+ *
+ * Rules:
+ *   Locked (prev arc not done)  → both hidden
+ *   Skipped                     → Unskip only
+ *   Watched                     → Unwatch only
+ *   Neither, progress === 0%    → Skip only  (episode hasn't entered arc)
+ *   Neither, progress > 0%      → Watched + Skip
+ */
+function updateFillerButtons(node, a) {
+  const btns = node.querySelectorAll('.btn-filler-action');
+  if (btns.length < 2) return;
+  const [btnA, btnB] = btns;
+
+  const isWatched  = state.watchedFillers.has(a.name);
+  const isSkipped  = state.skippedFillers.has(a.name);
+  const st         = arcStatus(a, state.episode);
+  const reachable  = st === 'unlocked' || st === 'current' || st === 'completed';
+  // progress > 0% means user has at least started the arc
+  const hasStarted = state.episode >= a.eps[0];
+
+  // Reset both
+  [btnA, btnB].forEach(b => {
+    b.className     = 'btn-filler-action';
+    b.style.display = 'none';
+    b.onclick       = null;
+    b.textContent   = '';
+  });
+
+  if (!reachable) return;  // locked — show nothing
+
+  if (isSkipped) {
+    // Skipped → Unskip only (no episode reversal)
+    btnA.className     = 'btn-filler-action action-unskip';
+    btnA.style.display = 'inline-flex';
+    btnA.textContent   = '↩ Unskip';
+    btnA.onclick = (e) => { e.stopPropagation(); unskipFillerArc(a); };
+
+  } else if (isWatched) {
+    // Watched → Unwatch only (no episode reversal)
+    btnA.className     = 'btn-filler-action action-unwatch';
+    btnA.style.display = 'inline-flex';
+    btnA.textContent   = '↩ Unwatch';
+    btnA.onclick = (e) => { e.stopPropagation(); unwatchFillerArc(a); };
+
+  } else if (!hasStarted) {
+    // Not started (progress 0%) → Skip only, no Watched button yet
+    btnA.className     = 'btn-filler-action action-skip';
+    btnA.style.display = 'inline-flex';
+    btnA.textContent   = '⏭ Skip';
+    btnA.onclick = (e) => { e.stopPropagation(); skipFillerArc(a); };
+
+  } else {
+    // Started (progress > 0%) → Watched + Skip
+    btnA.className     = 'btn-filler-action action-watch';
+    btnA.style.display = 'inline-flex';
+    btnA.textContent   = '✓ Watched';
+    btnA.onclick = (e) => { e.stopPropagation(); watchFillerArc(a); };
+
+    btnB.className     = 'btn-filler-action action-skip';
+    btnB.style.display = 'inline-flex';
+    btnB.textContent   = '⏭ Skip';
+    btnB.onclick = (e) => { e.stopPropagation(); skipFillerArc(a); };
+  }
 }
 
 /** Patch only the dynamic parts of an existing arc node. */
@@ -2155,6 +2322,7 @@ function patchArcNode(node, a, st, pg) {
   const base = `arc-item type-${a.type}`;
   const cls  = st === 'completed' ? `${base} completed`
              : st === 'current'   ? `${base} current`
+             : st === 'unlocked'  ? `${base} unlocked`
              :                      `${base} locked`;
   if (node.className !== cls) node.className = cls;
 
@@ -2178,9 +2346,13 @@ function patchArcNode(node, a, st, pg) {
     const icon = a.type === 'upcoming' ? '🏔️'
                : st === 'completed'   ? '✅'
                : st === 'current'     ? '⚡'
+               : st === 'unlocked'    ? '🔓'
                :                        '🔒';
     if (badge.textContent !== icon) badge.textContent = icon;
   }
+
+  // Re-configure filler buttons on every patch so state changes are reflected
+  if (a.type === 'filler') updateFillerButtons(node, a);
 }
 
 /** Attach click handler to an arc node (idempotent — only attaches once). */
@@ -2195,6 +2367,8 @@ function attachArcClick(node, a) {
     const f = a.type === 'filler';
     if (st === 'completed') {
       showToast(`${f ? '🟣' : '✅'} ${a.name} — Completed!`, f ? 'filler' : '');
+    } else if (st === 'unlocked') {
+      showToast(`🔓 ${a.name} unlocked — Ep ${a.eps[0]}–${arcEnd(a)}`, f ? 'filler' : '');
     } else {
       showToast(`⚡ Now in: ${a.name} (${a.eps[0]}–${arcEnd(a)})`, '');
     }
@@ -2324,6 +2498,108 @@ function setMainView(view) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   FILLER ARC ACTIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function _reRenderAll() {
+  syncInput(); renderHero(); renderStats(); renderArcGrid();
+}
+
+/**
+ * watchFillerArc(a)
+ * Marks filler as watched → counts in stat.
+ * Advances episode to arc end so it registers as completed.
+ */
+function watchFillerArc(a) {
+  state.watchedFillers.add(a.name);
+  state.skippedFillers.delete(a.name);   // can't be both
+
+  const end = a.eps[1];
+  // Only advance episode if user hasn't already passed this arc.
+  // If they're already ahead (e.g. ep 100 and filler ends at 68), don't touch it.
+  if (end && end <= state.totalEps && state.episode < end) {
+    const result = trySetEpisode(end);
+    if (result.ok) { syncInput(); renderHero(); }
+  }
+
+  saveState();
+  renderStats();
+  renderArcGrid();
+  showToast(`🟣 ${a.name} — Watched! Counts in Filler Arcs`, 'filler');
+}
+
+/**
+ * unwatchFillerArc(a)
+ * Removes watched flag.
+ * Only resets episode to start of arc if the user hasn't naturally
+ * completed it (episode < eps[1]) — preserves progress if they have.
+ */
+function unwatchFillerArc(a) {
+  state.watchedFillers.delete(a.name);
+
+  // If episode is exactly at the arc end (only got there via Watch button,
+  // not by naturally watching), reset to start of the arc so progress shows 0%
+  // and Skip/Watched buttons reappear correctly.
+  // But if episode is PAST the arc end, they naturally completed it — don't touch.
+  if (state.episode === a.eps[1] && state.episode < state.totalEps) {
+    // Snap back to one before the arc so it shows as unlocked at 0%
+    const result = trySetEpisode(a.eps[0] - 1);
+    if (result.ok) { syncInput(); renderHero(); }
+  }
+
+  saveState();
+  renderStats();
+  renderArcGrid();
+  showToast(`↩ ${a.name} — unmarked`, 'filler');
+}
+
+/**
+ * skipFillerArc(a)
+ * Marks filler as skipped (does NOT count in stat).
+ * Sets episode to end of arc so next arc unlocks.
+ */
+function skipFillerArc(a) {
+  const end = a.eps[1];
+
+  if (!end || end > state.totalEps) {
+    showToast(`⏭ Already past ${a.name}`, '');
+    return;
+  }
+
+  state.skippedFillers.add(a.name);
+  state.watchedFillers.delete(a.name);   // can't be both
+
+  // Only advance episode if user hasn't already passed this arc
+  if (state.episode < end) {
+    const result = trySetEpisode(end);
+    if (result.ok) {
+      _reRenderAll();
+      showToast(`⏭ Skipped ${a.name} — set to Ep ${end}`, 'filler');
+      return;
+    }
+  }
+
+  // Already past the arc — just mark as skipped, no episode change
+  saveState();
+  renderStats();
+  renderArcGrid();
+  showToast(`⏭ ${a.name} marked as skipped`, 'filler');
+}
+
+/**
+ * unskipFillerArc(a)
+ * Removes skipped flag. Does NOT reverse episode.
+ * Arc shows as completed (episode already past it) but neither watched nor skipped.
+ */
+function unskipFillerArc(a) {
+  state.skippedFillers.delete(a.name);
+  saveState();
+  renderStats();
+  renderArcGrid();
+  showToast(`↩ ${a.name} — unskipped`, 'filler');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    NOTIFICATION HELPERS
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -2434,12 +2710,14 @@ function closeResetDialog() {
 
 function confirmReset() {
   ['op_v5','op_v4','op_v3','op_tracker_v2','op_tracker_v1'].forEach(k => localStorage.removeItem(k));
-  state.episode       = 0;
-  state.notes         = '';
-  state.view          = 'all';
-  state.mainView      = 'series';
-  state.searchQuery   = '';
-  state.watchedMovies = new Set();
+  state.episode        = 0;
+  state.notes          = '';
+  state.view           = 'all';
+  state.mainView       = 'series';
+  state.searchQuery    = '';
+  state.watchedMovies  = new Set();
+  state.watchedFillers = new Set();
+  state.skippedFillers = new Set();
   closeResetDialog();
   clearSearch();
   setView('all');
@@ -2556,7 +2834,9 @@ document.getElementById('importInput').addEventListener('change', function () {
     state.notes         = typeof parsed.notes === 'string' ? parsed.notes : state.notes;
     state.view          = ['all', 'canon', 'filler', 'ongoing'].includes(parsed.view) ? parsed.view : 'all';
     state.mainView      = parsed.mainView === 'movies' ? 'movies' : 'series';
-    state.watchedMovies = new Set(Array.isArray(parsed.watchedMovies) ? parsed.watchedMovies : []);
+    state.watchedMovies  = new Set(Array.isArray(parsed.watchedMovies)  ? parsed.watchedMovies  : []);
+    state.watchedFillers = new Set(Array.isArray(parsed.watchedFillers) ? parsed.watchedFillers : []);
+    state.skippedFillers = new Set(Array.isArray(parsed.skippedFillers) ? parsed.skippedFillers : []);
     state.searchQuery   = '';
 
     saveState();
