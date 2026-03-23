@@ -17,7 +17,7 @@ Built by **Karan**.
 I wanted a lightweight, custom solution for my fresh rewatch of the series, without relying on bloated tracking sites or heavy web frameworks. 
 
 * **Tech Stack:** 100% Vanilla Web Technologies—just HTML, CSS (utilizing modern CSS variables and flex/grid layouts), and JavaScript. 
-* **AI Collaboration:** I architected and built this app by leveraging AI. I used **Claude** to generate, structure, and refactor the core codebase based on my specific feature requirements, while utilizing **Google Gemini** to troubleshoot code, optimize performance (like the DOM-patching algorithm and GPU animation), handle the PWA configuration (Manifest + Service Worker), and generate the custom Straw Hat Jolly Roger app icons.
+* **AI Collaboration:** I architected and built this app by leveraging AI.
 * **Deployment:** Hosted seamlessly via GitHub Pages.
 
 ## ⚓ Installation 
