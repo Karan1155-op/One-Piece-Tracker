@@ -1720,6 +1720,8 @@
   </div>
 </div>
 
+<audio id="bgm" src="assets/music_track.mp3" loop preload="auto"></audio>
+
 <script>
 'use strict';
 
@@ -2958,6 +2960,48 @@ loadState();
 renderAll();
 setView(state.view);            // syncs arc filter toggle aria-pressed
 setMainView(state.mainView);    // syncs TV Series / Movies toggle + visibility
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BACKGROUND MUSIC
+   ═══════════════════════════════════════════════════════════════════════════ */
+function startMusic() {
+  const bgm = document.getElementById('bgm');
+  bgm.volume = 0; // Start silent for the fade-in effect
+
+  // Wait 3 seconds before trying to play
+  setTimeout(() => {
+    bgm.play().then(() => {
+      // Fade in smoothly to 40% volume (0.4)
+      let fade = setInterval(() => {
+        if (bgm.volume < 0.4) {
+          bgm.volume = Math.min(bgm.volume + 0.05, 0.4);
+        } else {
+          clearInterval(fade);
+        }
+      }, 200);
+    }).catch(() => {
+      // Autoplay blocked by browser. Wait for the user's first tap/click to play.
+      const playOnTap = () => {
+        bgm.play().then(() => {
+          let fade = setInterval(() => {
+            if (bgm.volume < 0.4) {
+              bgm.volume = Math.min(bgm.volume + 0.05, 0.4);
+            } else {
+              clearInterval(fade);
+            }
+          }, 200);
+        });
+        document.removeEventListener('click', playOnTap);
+        document.removeEventListener('touchstart', playOnTap);
+      };
+      document.addEventListener('click', playOnTap);
+      document.addEventListener('touchstart', playOnTap);
+    });
+  }, 3000); 
+}
+
+window.addEventListener('load', startMusic);
+
 
 // Start live countdown (every second)
 updateCountdown();
