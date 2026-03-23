@@ -1060,6 +1060,195 @@
       justify-content: center;
     }
 
+    /* ── Dual-View Segmented Control ─────────────────────────────────────── */
+    .view-control {
+      display:         flex;
+      justify-content: center;
+      margin:          0 0 22px;
+    }
+
+    .view-pill {
+      display:       flex;
+      background:    rgba(255, 255, 255, .04);
+      border:        1px solid var(--border);
+      border-radius: 16px;
+      padding:       4px;
+      gap:           3px;
+    }
+
+    .view-btn {
+      font-family:    'Cinzel Decorative', serif;
+      font-size:      11px;
+      letter-spacing: .1em;
+      padding:        11px 32px;
+      border-radius:  12px;
+      cursor:         pointer;
+      border:         none;
+      background:     transparent;
+      color:          var(--text-muted);
+      transition:     all .25s;
+    }
+
+    .view-btn.active {
+      background: linear-gradient(135deg, var(--gold-dim), var(--amber));
+      color:      #000;
+    }
+
+    .view-btn:hover:not(.active) {
+      color:      var(--text);
+      background: rgba(255, 255, 255, .06);
+    }
+
+    .view-btn:focus-visible {
+      outline:    none;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* ── Movie Grid ────────────────────────────────────────────────────────── */
+    .movie-grid {
+      display:        flex;
+      flex-direction: column;
+      gap:            6px;
+    }
+
+    .movie-item {
+      background:    var(--panel);
+      border:        1px solid var(--border);
+      border-radius: 9px;
+      padding:       14px 18px;
+      display:       grid;
+      grid-template-columns: 1fr auto auto auto;
+      align-items:   center;
+      gap:           12px;
+      position:      relative;
+      overflow:      hidden;
+      transition:    border-color .2s, background .2s;
+      cursor:        default;
+    }
+
+    .movie-item::before {
+      content:    '';
+      position:   absolute;
+      left: 0; top: 0; bottom: 0;
+      width:      3px;
+      background: var(--border);
+      transition: background .3s;
+    }
+
+    /* All movies are always visible — no locked state */
+    .movie-item.unwatched {
+      border-color: rgba(200, 144, 58, .15);
+      cursor:       default;
+    }
+    .movie-item.unwatched::before { background: var(--gold-dim); }
+
+    .movie-item.watched {
+      border-color: rgba(34, 176, 158, .3);
+      background:   rgba(26, 138, 122, .07);
+      cursor:       default;
+    }
+    .movie-item.watched::before { background: var(--teal); }
+
+    /* The explicit "Mark Watched" / "Unmark" button */
+    .movie-watch-btn {
+      font-family:    'Cinzel Decorative', serif;
+      font-size:      8px;
+      letter-spacing: .08em;
+      padding:        7px 12px;
+      border-radius:  8px;
+      cursor:         pointer;
+      border:         none;
+      white-space:    nowrap;
+      transition:     all .2s;
+      flex-shrink:    0;
+    }
+
+    .movie-watch-btn.btn-mark {
+      background: linear-gradient(135deg, var(--gold-dim), var(--amber));
+      color:      #000;
+    }
+
+    .movie-watch-btn.btn-mark:hover {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      transform:  translateY(-1px);
+    }
+
+    .movie-watch-btn.btn-unmark {
+      background:   transparent;
+      color:        var(--teal-light);
+      border:       1px solid rgba(34, 176, 158, .4);
+    }
+
+    .movie-watch-btn.btn-unmark:hover {
+      background:   rgba(34, 176, 158, .1);
+      border-color: var(--teal-light);
+    }
+
+    .movie-meta { flex: 1; }
+
+    .movie-title-row {
+      display:       flex;
+      align-items:   center;
+      gap:           7px;
+      flex-wrap:     wrap;
+      margin-bottom: 3px;
+    }
+
+    .movie-title {
+      font-size:   17px;
+      font-weight: 600;
+      color:       var(--white);
+    }
+
+    .movie-item.locked .movie-title { color: var(--text-muted); }
+
+    .movie-sub  { font-size: 11px; color: var(--text-muted); font-style: italic; }
+    .movie-note { font-size: 10px; color: var(--text-muted); font-style: italic; margin-top: 2px; opacity: .8; }
+
+    /* Recommendation tags */
+    .rec-high  { border: 1px solid #FFD700;            color: #FFD700;            }
+    .rec-watch { border: 1px solid var(--teal-light);  color: var(--teal-light);  }
+    .rec-skip  { border: 1px solid var(--text-dim);    color: var(--text-dim);    }
+
+    /* Watch-after chip */
+    .movie-after {
+      font-family:    'Cinzel Decorative', serif;
+      font-size:      9px;
+      color:          var(--text-dim);
+      letter-spacing: .07em;
+      text-align:     right;
+      white-space:    nowrap;
+      line-height:    1.5;
+    }
+
+    .movie-badge {
+      width:           24px;
+      height:          24px;
+      border-radius:   50%;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      font-size:       13px;
+      flex-shrink:     0;
+    }
+
+    .movie-item.watched   .movie-badge { background: rgba(34, 176, 158, .2); }
+    .movie-item.unwatched .movie-badge { background: rgba(200, 144, 58, .1); }
+
+    /* Light-mode movie overrides */
+    [data-theme="light"] .movie-item.watched {
+      border-color: rgba(21, 107, 94, .4);
+      background:   rgba(21, 107, 94, .08);
+    }
+    [data-theme="light"] .movie-item.unwatched { border-color: rgba(160, 112, 10, .2); }
+
+    @media (max-width: 500px) {
+      .movie-item        { grid-template-columns: 1fr auto auto; }
+      .movie-after       { display: none; }
+      .movie-watch-btn   { padding: 6px 9px; font-size: 7px; }
+      .view-btn    { padding: 10px 18px; font-size: 10px; }
+    }
+
     /* ── Theme Toggle Button ──────────────────────────────────────────────── */
     header {
       position: relative;   /* anchor for the absolute-positioned toggle */
@@ -1231,6 +1420,14 @@
     </div>
   </div>
 
+  <!-- ── View Toggle ─────────────────────────────────────────────────────── -->
+  <div class="view-control">
+    <div class="view-pill" role="group" aria-label="Switch between TV Series and Movies">
+      <button class="view-btn active" id="viewbtn-series" onclick="setMainView('series')" aria-pressed="true">📺 TV Series</button>
+      <button class="view-btn"        id="viewbtn-movies" onclick="setMainView('movies')" aria-pressed="false">🎬 Movies</button>
+    </div>
+  </div>
+
   <!-- ── Progress Hero ───────────────────────────────────────────────────── -->
   <div class="progress-hero" role="region" aria-label="Overall progress">
     <div class="progress-hero-inner">
@@ -1316,6 +1513,10 @@
       <div class="stat-desc">Filler Arcs</div>
     </div>
     <div class="stat-card">
+      <div class="stat-num" id="statMovies" aria-live="polite">0</div>
+      <div class="stat-desc">Movies Watched</div>
+    </div>
+    <div class="stat-card">
       <div class="stat-num" id="statRemaining" aria-live="polite">—</div>
       <div class="stat-desc">Eps Remaining</div>
     </div>
@@ -1363,8 +1564,16 @@
     <div class="legend-item"><div class="legend-dot dot-ongoing"></div>Ongoing</div>
   </div>
 
-  <!-- Arc Grid -->
-  <div class="arc-grid" id="arcGrid" role="list" aria-label="Story arcs"></div>
+  <!-- TV Series Section -->
+  <div id="seriesSection">
+    <!-- Arc Grid -->
+    <div class="arc-grid" id="arcGrid" role="list" aria-label="Story arcs"></div>
+  </div>
+
+  <!-- Movies Section -->
+  <div id="moviesSection" style="display:none;">
+    <div class="movie-grid" id="movieGrid" role="list" aria-label="One Piece movies"></div>
+  </div>
 
   <!-- ── Captain's Log ────────────────────────────────────────────────────── -->
   <div class="notes-card">
@@ -1508,33 +1717,60 @@ const ARCS = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   MOVIES DATA
+   All 15 theatrical films · placement & recommendations via community consensus
+   rec: 'high' = Highly Recommended  |  'watch' = Worth Watching  |  'skip' = Skip/Recap
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MOVIES = [
+  { id:  1, name: 'One Piece: The Movie',                           year: 2000, icon: '🏴‍☠️', requiredEpisode:  18,   rec: 'skip',  note: 'Standalone retelling of early East Blue. Safe to skip.' },
+  { id:  2, name: 'Clockwork Island Adventure',                     year: 2001, icon: '⚙️',  requiredEpisode:  53,   rec: 'skip',  note: 'Non-canon standalone adventure. Fun but skippable.' },
+  { id:  3, name: "Chopper's Kingdom on the Island of Strange Animals", year: 2002, icon: '🦌', requiredEpisode:  91,   rec: 'skip',  note: 'Chopper-focused non-canon. Very kid-friendly.' },
+  { id:  4, name: 'Dead End Adventure',                             year: 2003, icon: '💀',  requiredEpisode: 130,   rec: 'watch', note: 'Best of the early movies — great action and atmosphere.' },
+  { id:  5, name: 'The Cursed Holy Sword',                          year: 2004, icon: '⚔️',  requiredEpisode: 130,   rec: 'skip',  note: 'Zoro-focused but non-canon and forgettable.' },
+  { id:  6, name: 'Baron Omatsuri and the Secret Island',           year: 2005, icon: '🌺',  requiredEpisode: 195,   rec: 'high',  note: '⭐ Uniquely dark. Directed by Mamoru Hosoda. A must-watch.' },
+  { id:  7, name: 'The Giant Mechanical Soldier of Karakuri Castle',year: 2006, icon: '🏯',  requiredEpisode: 206,   rec: 'skip',  note: 'Fun non-canon filler adventure. Skippable.' },
+  { id:  8, name: 'The Desert Princess and the Pirates',            year: 2007, icon: '🏜️',  requiredEpisode: 130,   rec: 'skip',  note: 'Alabasta recap film. Skip if you watched the arc.' },
+  { id:  9, name: 'Episode of Chopper Plus',                        year: 2008, icon: '❄️',  requiredEpisode: 130,   rec: 'skip',  note: 'Drum Island recap with post-timeskip crew. Skip.' },
+  { id: 10, name: 'Strong World',                                   year: 2009, icon: '⚡',  requiredEpisode: 429,   rec: 'high',  note: '⭐ Canon-adjacent, written by Oda himself. Essential.' },
+  { id: 11, name: 'Film Z',                                         year: 2012, icon: '🔥',  requiredEpisode: 578,   rec: 'high',  note: '⭐ Outstanding animation and a genuinely great villain.' },
+  { id: 12, name: '3D2Y',                                           year: 2014, icon: '📅',  requiredEpisode: 516,   rec: 'watch', note: 'TV special covering the 2-year timeskip. Worth it.' },
+  { id: 13, name: 'Film Gold',                                      year: 2016, icon: '💰',  requiredEpisode: 750,   rec: 'high',  note: '⭐ Lavish production and great crew moments. Must-watch.' },
+  { id: 14, name: 'Stampede',                                       year: 2019, icon: '🌊',  requiredEpisode: 896,   rec: 'high',  note: '⭐ 20th anniversary celebration. Fan-service done right.' },
+  { id: 15, name: 'Film Red',                                       year: 2022, icon: '🎵',  requiredEpisode: 1030,  rec: 'high',  note: '⭐ Shanks lore, stunning music, canon-relevant details.' },
+];
+
+/* ═══════════════════════════════════════════════════════════════════════════
    STATE
    ═══════════════════════════════════════════════════════════════════════════ */
-const ELBAF_DATE    = new Date('2026-04-05T00:00:00+09:00'); // JST premiere
+const ELBAF_DATE     = new Date('2026-04-05T00:00:00+09:00'); // JST premiere
 const FALLBACK_TOTAL = 1155;  // used until API responds
 
 const state = {
-  episode:    0,
-  notes:      '',
-  view:       'all',
-  totalEps:   FALLBACK_TOTAL,
-  searchQuery: '',
+  episode:       0,
+  notes:         '',
+  view:          'all',
+  mainView:      'series',   // 'series' | 'movies'
+  totalEps:      FALLBACK_TOTAL,
+  searchQuery:   '',
+  watchedMovies: new Set(),  // Set of movie ids the user has marked watched
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PERSISTENCE
    ═══════════════════════════════════════════════════════════════════════════ */
 function loadState() {
-  // Migrate from any older storage keys
   const keys = ['op_v5', 'op_v4', 'op_v3', 'op_tracker_v2', 'op_tracker_v1'];
   for (const k of keys) {
     const raw = localStorage.getItem(k);
     if (raw) {
       try {
-        const s       = JSON.parse(raw);
-        state.episode = s.episode || 0;
-        state.notes   = s.notes   || '';
-        state.view    = s.view    || 'all';
+        const s            = JSON.parse(raw);
+        state.episode      = s.episode  || 0;
+        state.notes        = s.notes    || '';
+        state.view         = s.view     || 'all';
+        state.mainView     = s.mainView || 'series';
+        // watchedMovies is serialised as an array — restore to a Set
+        state.watchedMovies = new Set(Array.isArray(s.watchedMovies) ? s.watchedMovies : []);
       } catch (_) { /* ignore corrupt data */ }
       break;
     }
@@ -1543,9 +1779,11 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem('op_v5', JSON.stringify({
-    episode: state.episode,
-    notes:   state.notes,
-    view:    state.view,
+    episode:       state.episode,
+    notes:         state.notes,
+    view:          state.view,
+    mainView:      state.mainView,
+    watchedMovies: Array.from(state.watchedMovies), // Set → array for JSON
   }));
 }
 
@@ -1702,13 +1940,16 @@ function tryWatchNext() {
    UI RENDER  (reads state, writes DOM — no logic beyond display)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Full re-render: hero, stats, arc grid. */
+/** Full re-render: hero, stats, arc grid, movie grid. */
 function renderAll() {
   renderHero();
   renderStats();
   renderArcGrid();
+  renderMovieGrid();
   syncInput();
   document.getElementById('notes').value = state.notes;
+  // Restore correct section visibility after a full re-render
+  _applyMainViewVisibility();
 }
 
 /** Re-render just the parts that depend on state.totalEps */
@@ -1746,6 +1987,7 @@ function renderStats() {
   document.getElementById('statHours').textContent     = hrs >= 1000 ? (Math.round(hrs / 100) / 10) + 'k h' : hrs + 'h';
   document.getElementById('statArcs').textContent      = ARCS.filter(a => a.type === 'canon'  && ep >= arcEnd(a)).length;
   document.getElementById('statFiller').textContent    = ARCS.filter(a => a.type === 'filler' && ep >= a.eps[1]).length;
+  document.getElementById('statMovies').textContent    = state.watchedMovies.size;
   document.getElementById('statRemaining').textContent = Math.max(0, tot - ep);
 }
 
@@ -1960,6 +2202,130 @@ function attachArcClick(node, a) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   MOVIE GRID
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * movieStatus(movie)
+ * Two states only — no locking, every movie is always available:
+ *   unwatched — not yet marked by the user
+ *   watched   — manually marked as watched
+ */
+function movieStatus(movie) {
+  return state.watchedMovies.has(movie.id) ? 'watched' : 'unwatched';
+}
+
+/**
+ * toggleMovieWatched(movie)
+ * Marks or unmarks a movie as watched.
+ * Called only from the explicit Watch/Unmark button — not the card body.
+ * Plays the Don! sound when marking as watched.
+ */
+function toggleMovieWatched(movie) {
+  if (state.watchedMovies.has(movie.id)) {
+    state.watchedMovies.delete(movie.id);
+    showToast(`↩ ${movie.name} — unmarked`, '');
+  } else {
+    state.watchedMovies.add(movie.id);
+    playClickSound();
+    showToast(`🎬 ${movie.name} — Watched!`, '');
+  }
+  saveState();
+  renderMovieGrid();
+  renderStats();
+}
+
+/**
+ * renderMovieGrid()
+ * All 15 movies are always shown — no locking.
+ * requiredEpisode is shown as an informational hint only ("Best after Ep X").
+ * Each card has an explicit Watch / Unmark button on the right.
+ */
+function renderMovieGrid() {
+  const grid = document.getElementById('movieGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const fragment = document.createDocumentFragment();
+
+  for (const movie of MOVIES) {
+    const st = movieStatus(movie);  // 'watched' | 'unwatched'
+
+    const recLabel = movie.rec === 'high'  ? '⭐ Highly Recommended'
+                   : movie.rec === 'watch' ? '👍 Worth Watching'
+                   :                         '⏭ Skip/Recap';
+    const recClass = 'tag-base ' + (
+      movie.rec === 'high'  ? 'rec-high'  :
+      movie.rec === 'watch' ? 'rec-watch' : 'rec-skip'
+    );
+
+    const badge     = st === 'watched' ? '✅' : '🎬';
+    const hintText  = `Best after Ep ${movie.requiredEpisode}`;
+    const btnLabel  = st === 'watched' ? 'Unmark' : '✓ Watched';
+    const btnClass  = st === 'watched' ? 'movie-watch-btn btn-unmark' : 'movie-watch-btn btn-mark';
+
+    const div = document.createElement('div');
+    div.className = `movie-item ${st}`;
+    div.setAttribute('role', 'listitem');
+
+    div.innerHTML = `
+      <div class="movie-meta">
+        <div class="movie-title-row">
+          <span class="movie-title">${movie.icon} ${movie.name}</span>
+          <span class="${recClass}">${recLabel}</span>
+        </div>
+        <div class="movie-sub">Movie ${movie.id} · ${movie.year}</div>
+        ${movie.note ? `<div class="movie-note">ℹ️ ${movie.note}</div>` : ''}
+      </div>
+      <div class="movie-after">${hintText}</div>
+      <div class="movie-badge">${badge}</div>
+      <button class="${btnClass}" aria-label="${btnLabel} ${movie.name}">${btnLabel}</button>
+    `;
+
+    // Only the button triggers the watch toggle — not the card body
+    div.querySelector('.movie-watch-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMovieWatched(movie);
+    });
+
+    fragment.appendChild(div);
+  }
+
+  grid.appendChild(fragment);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAIN VIEW TOGGLE  (TV Series ↔ Movies)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Internal helper — show/hide the two sections and sync button state. */
+function _applyMainViewVisibility() {
+  const isSeries = state.mainView === 'series';
+
+  const ss = document.getElementById('seriesSection');
+  const ms = document.getElementById('moviesSection');
+  if (ss) ss.style.display = isSeries ? '' : 'none';
+  if (ms) ms.style.display = isSeries ? 'none' : '';
+
+  ['series', 'movies'].forEach(v => {
+    const btn = document.getElementById('viewbtn-' + v);
+    if (!btn) return;
+    const isActive = v === state.mainView;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+/** Called from HTML onclick — switches main view and re-renders if needed. */
+function setMainView(view) {
+  state.mainView = view;
+  saveState();
+  _applyMainViewVisibility();
+  // Always refresh the movie grid when switching to it so lock states update
+  if (view === 'movies') renderMovieGrid();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    NOTIFICATION HELPERS
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -1994,6 +2360,7 @@ function commitEpisode() {
     renderHero();
     renderStats();
     renderArcGrid();
+    renderMovieGrid(); // re-evaluate lock states when episode changes
   }
 }
 
@@ -2006,6 +2373,7 @@ function watchNextEp() {
     renderHero();
     renderStats();
     renderArcGrid();
+    renderMovieGrid(); // re-evaluate lock states when episode changes
   }
 }
 
@@ -2067,16 +2435,18 @@ function closeResetDialog() {
 }
 
 function confirmReset() {
-  // Clear all known storage keys
   ['op_v5','op_v4','op_v3','op_tracker_v2','op_tracker_v1'].forEach(k => localStorage.removeItem(k));
-  state.episode     = 0;
-  state.notes       = '';
-  state.view        = 'all';
-  state.searchQuery = '';
+  state.episode       = 0;
+  state.notes         = '';
+  state.view          = 'all';
+  state.mainView      = 'series';
+  state.searchQuery   = '';
+  state.watchedMovies = new Set();
   closeResetDialog();
   clearSearch();
   setView('all');
   renderAll();
+  setMainView('series');
   showToast('⚓ Journey reset — Romance Dawn awaits!', '');
 }
 
@@ -2104,11 +2474,13 @@ document.addEventListener('keydown', e => {
  */
 function exportSave() {
   const payload = {
-    version:   2,                          // bump this if the save schema ever changes
-    exportedAt: new Date().toISOString(),  // human-readable timestamp for the filename label
-    episode:   state.episode,
-    notes:     state.notes,
-    view:      state.view,
+    version:       3,
+    exportedAt:    new Date().toISOString(),
+    episode:       state.episode,
+    notes:         state.notes,
+    view:          state.view,
+    mainView:      state.mainView,
+    watchedMovies: Array.from(state.watchedMovies),
   };
 
   const json = JSON.stringify(payload, null, 2);
@@ -2182,15 +2554,18 @@ document.getElementById('importInput').addEventListener('change', function () {
 
     // Apply the imported values to state, falling back to current values for
     // any optional fields that might be absent in older export versions.
-    state.episode     = parsed.episode;
-    state.notes       = typeof parsed.notes === 'string' ? parsed.notes : state.notes;
-    state.view        = ['all', 'canon', 'filler', 'ongoing'].includes(parsed.view) ? parsed.view : 'all';
-    state.searchQuery = '';   // reset search so the restored arc list is visible immediately
+    state.episode       = parsed.episode;
+    state.notes         = typeof parsed.notes === 'string' ? parsed.notes : state.notes;
+    state.view          = ['all', 'canon', 'filler', 'ongoing'].includes(parsed.view) ? parsed.view : 'all';
+    state.mainView      = parsed.mainView === 'movies' ? 'movies' : 'series';
+    state.watchedMovies = new Set(Array.isArray(parsed.watchedMovies) ? parsed.watchedMovies : []);
+    state.searchQuery   = '';
 
     saveState();
     clearSearch();
     renderAll();
     setView(state.view);
+    setMainView(state.mainView);
 
     const label = parsed.exportedAt
       ? ` (saved ${new Date(parsed.exportedAt).toLocaleDateString()})`
@@ -2296,7 +2671,8 @@ document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 loadTheme();    // MUST run before renderAll so colours are correct on first paint
 loadState();
 renderAll();
-setView(state.view);            // also syncs toggle button aria-pressed
+setView(state.view);            // syncs arc filter toggle aria-pressed
+setMainView(state.mainView);    // syncs TV Series / Movies toggle + visibility
 
 // Start live countdown (every second)
 updateCountdown();
