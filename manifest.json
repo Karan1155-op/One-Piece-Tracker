@@ -1,6 +1,6 @@
 {
-  "name": "One Piece Tracker",
-  "short_name": "OP Tracker",
+  "name": "One Piece Journey Tracker",
+  "short_name": "OP Journey",
   "description": "Track your One Piece watching journey — arcs, filler, and the road to Elbaf.",
   "start_url": "./index.html",
   "scope": "./",
@@ -23,7 +23,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "screenshots": [],
-  "shortcuts": []
+  ]
 }
