@@ -8,7 +8,7 @@
  * so the old cache is pruned automatically on the next visit.
  */
 
-const CACHE_VERSION  = 'op-tracker-v20';
+const CACHE_VERSION  = 'op-tracker-v21';
 const CACHE_NAME     = CACHE_VERSION;
 
 /**
@@ -20,6 +20,7 @@ const APP_SHELL = [
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './assets/music_track.mp3',
 ];
 
 /**
