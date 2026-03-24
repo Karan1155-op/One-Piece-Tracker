@@ -1411,6 +1411,29 @@
       transform:    translateY(-1px);
     }
 
+    /* ── Share Button ── */
+    .share-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--gold-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-family: 'Cinzel Decorative', serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+    .share-btn:hover {
+      background: rgba(200, 144, 58, 0.15);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+    .share-btn:active { transform: translateY(0); }
+
     /* ⏭ Skip — purple */
     .btn-filler-action.action-skip {
       border:     1px solid rgba(124, 79, 160, .5);
@@ -1507,6 +1530,9 @@
 
   <!-- ── Progress Hero ───────────────────────────────────────────────────── -->
   <div class="progress-hero" role="region" aria-label="Overall progress">
+    <button class="share-btn" onclick="shareProgress()" aria-label="Share your progress">
+      📸 Share Journey
+    </button>
     <div class="progress-hero-inner">
       <div class="big-number" aria-hidden="true">
         <div class="big-ep" id="currentEpDisplay">0</div>
@@ -2944,6 +2970,165 @@ function loadTheme() {
 }
 
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SHARE PROGRESS (NATIVE CANVAS GENERATOR) - SAGA UPGRADE
+   ═══════════════════════════════════════════════════════════════════════════ */
+function shareProgress() {
+  showToast('📸 Generating status image...', '');
+  
+  // Create a high-res hidden canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 1200;
+  canvas.height = 630;
+  const ctx = canvas.getContext('2d');
+  
+  // 1. Draw Deep Sea Background
+  const grad = ctx.createLinearGradient(0, 0, 1200, 630);
+  grad.addColorStop(0, '#111a2e');
+  grad.addColorStop(1, '#0a0e1a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1200, 630);
+  
+  // 2. Draw Top Accent Line
+  const topGrad = ctx.createLinearGradient(0, 0, 1200, 0);
+  topGrad.addColorStop(0, '#c0392b');
+  topGrad.addColorStop(0.5, '#c8903a');
+  topGrad.addColorStop(1, '#1a8a7a');
+  ctx.fillStyle = topGrad;
+  ctx.fillRect(0, 0, 1200, 8);
+  
+  // 3. Draw Title & Subtitle
+  ctx.fillStyle = '#e8b04a';
+  ctx.font = 'bold 50px "Cinzel Decorative", serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('ONE PIECE JOURNEY', 600, 90);
+  
+  ctx.fillStyle = '#d4c5a9';
+  ctx.font = 'italic 24px "Crimson Pro", serif';
+  ctx.fillText('I\'m going to be King of the Pirates', 600, 130);
+  
+  // --- CALCULATE PROGRESS VARIABLES ---
+  const ep = state.episode || 0;
+  const tot = state.totalEps || 1155;
+  const overallPct = Math.min(100, Math.round((ep / tot) * 100));
+  
+  const currentArc = getCurrentArc(ep);
+  const arcName = currentArc ? currentArc.name : (ep === 0 ? 'Romance Dawn' : '—');
+  const arcPct = currentArc ? arcProgress(currentArc, ep) : 0;
+  
+  // NEW: Calculate Current Saga
+  const currentSagaRaw = currentArc ? currentArc.saga : 'East Blue';
+  const displaySaga = currentSagaRaw.endsWith('Saga') ? currentSagaRaw : currentSagaRaw + ' Saga';
+  
+  let prevArcName = '';
+  if (currentArc) {
+    const idx = ARCS.indexOf(currentArc);
+    if (idx > 0) prevArcName = ARCS[idx - 1].name;
+  }
+  
+  // NEW: Calculate Completed Sagas
+  // Get all unique saga names, then check if we have passed the final arc of each
+  const uniqueSagas = [...new Set(ARCS.filter(a => a.type !== 'upcoming').map(a => a.saga))];
+  let completedSagasCount = 0;
+  
+  for (const s of uniqueSagas) {
+    const arcsInSaga = ARCS.filter(a => a.saga === s);
+    const lastArc = arcsInSaga[arcsInSaga.length - 1];
+    if (ep >= arcEnd(lastArc)) {
+      completedSagasCount++;
+    }
+  }
+  
+  // 4. Draw Current Episode Number
+  ctx.fillStyle = '#c8903a';
+  ctx.font = 'bold 160px "Cinzel Decorative", serif';
+  ctx.fillText(ep, 600, 310);
+  
+  ctx.fillStyle = '#7a8499';
+  ctx.font = '22px sans-serif';
+  ctx.fillText('CURRENT EPISODE', 600, 350);
+  
+  // 5. Draw Detailed Breakdown
+  
+  // Line A: Previous Arc
+  if (prevArcName) {
+    ctx.fillStyle = '#22b09e';
+    ctx.font = 'italic 26px "Crimson Pro", serif';
+    ctx.fillText(`✅ Previously Completed: ${prevArcName}`, 600, 420);
+  }
+  
+  // Line B: Current Arc + Current Saga + Local Progress
+  ctx.fillStyle = '#e8b04a';
+  ctx.font = 'bold 34px "Crimson Pro", serif'; // Scaled down slightly to fit the saga name beautifully
+  ctx.fillText(`⚡ Now in: ${arcName} (${displaySaga}) • ${arcPct}% Arc Complete`, 600, 470);
+  
+  // Line C: Total Overall Progress
+  ctx.fillStyle = '#f0ead8';
+  ctx.font = 'bold 30px "Crimson Pro", serif';
+  ctx.fillText(`🌊 Total Journey: ${overallPct}% Conquered`, 600, 520);
+  
+  // 6. Draw Bottom Stats (Now including Sagas!)
+  const arcsCompleted = ARCS.filter(a => a.type !== 'upcoming' && ep >= arcEnd(a)).length;
+  const movieCount = (state.watchedMovies && state.watchedMovies.size) ? state.watchedMovies.size : 0;
+  const remaining = Math.max(0, tot - ep);
+  const streakNum = (state.streak && state.streak.current) ? state.streak.current : 0;
+  
+  ctx.fillStyle = '#7a8499';
+  ctx.font = '22px sans-serif'; // Reduced font size slightly so it fits across mobile screens
+  
+  let statsText = '';
+  if (streakNum > 0) {
+    statsText += `🔥 Streak: ${streakNum} Days   |   `;
+  }
+  
+  // Added Sagas metric right before Arcs
+  statsText += `🗺️ Sagas: ${completedSagasCount}   |   🏝️ Arcs: ${arcsCompleted}   |   🎬 Movies: ${movieCount}   |   ⏳ Remaining: ${remaining}`;
+  
+  ctx.fillText(statsText, 600, 575);
+  
+  // 7. Draw Watermark (I already updated this with your live link!)
+  ctx.fillStyle = '#4a5566';
+  ctx.font = 'italic 20px sans-serif';
+  ctx.fillText('Track your own journey ad-free at: https://Karan1155-op.github.io/one-piece-tracker/', 600, 615);
+  
+  // 8. Export to Image and Trigger Native Share
+  canvas.toBlob((blob) => {
+    if (!blob) {
+      showToast('⚠️ Error generating image', '');
+      return;
+    }
+    const file = new File([blob], `op-journey-ep${ep}.png`, { type: 'image/png' });
+    
+    // Updated default share text to also mention the Saga
+    const shareData = {
+      title: 'My One Piece Journey',
+      text: `I'm on Episode ${ep} (${arcName} in the ${displaySaga})! Track your One Piece journey ad-free:`,
+      files: [file]
+    };
+    
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share(shareData)
+        .then(() => showToast('✅ Shared successfully!', ''))
+        .catch((err) => {
+          if (err.name !== 'AbortError') fallbackDownload(blob, file.name);
+        });
+    } else {
+      fallbackDownload(blob, file.name);
+    }
+  }, 'image/png');
+}
+function fallbackDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📥 Image downloaded! Share it anywhere.', '');
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    BOOT
