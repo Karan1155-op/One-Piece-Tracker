@@ -339,7 +339,7 @@
       background:    linear-gradient(135deg, var(--panel) 0%, rgba(20, 30, 50, .8) 100%);
       border:        1px solid var(--border);
       border-radius: 16px;
-      padding:       26px;
+      padding:       26px 26px 46px 26px;
       margin-bottom: 20px;
       position:      relative;
       overflow:      hidden;
@@ -695,20 +695,39 @@
       right:      10px;
       top:        50%;
       transform:  translateY(-50%);
-      background: none;
+      background: rgba(255, 255, 255, 0.08);
       border:     none;
       cursor:     pointer;
       color:      var(--text-muted);
-      font-size:  16px;
-      padding:    4px 6px;
-      border-radius: 4px;
-      line-height: 1;
+      font-size:  14px;
+      width:      24px;
+      height:     24px;
+      border-radius: 50%; /* Makes it a perfect circle */
       display:    none;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, sans-serif; /* Forces a crisp, modern X */
+      transition: all 0.2s;
+      padding-bottom: 2px; /* Visually balances the X vertically */
     }
 
-    .search-clear:hover          { color: var(--text); }
-    .search-clear.visible        { display: block; }
-    .search-clear:focus-visible  { box-shadow: var(--focus-ring); outline: none; }
+    .search-clear.visible {
+      display: flex; /* Uses flexbox for perfect centering instead of block */
+    }
+
+    .search-clear:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color:      var(--white);
+    }
+
+    .search-clear:focus-visible {
+      box-shadow: var(--focus-ring); 
+      outline: none; 
+    }
+
+    /* Light mode override so it looks good on parchment */
+    [data-theme="light"] .search-clear { background: rgba(0, 0, 0, 0.06); }
+    [data-theme="light"] .search-clear:hover { background: rgba(0, 0, 0, 0.15); color: var(--text); }
 
     /* ── Legend ────────────────────────────────────────────────────────────── */
     .legend {
@@ -1414,7 +1433,8 @@
     /* ── Share Button ── */
     .share-btn {
       position: absolute;
-      top: 16px;
+      top: auto;
+      bottom: 14px;
       right: 16px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border);
@@ -1480,6 +1500,55 @@
 
     /* ── Responsive ────────────────────────────────────────────────────────── */
     @media (max-width: 500px) {
+      .stats-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      .stat-card {
+        padding: 10px 4px;
+      }
+      .stat-num {
+        font-size: 18px;
+      }
+      .stat-desc {
+        font-size: 8px;
+        letter-spacing: 0;
+      }
+      /* UPDATED: Compact Elbaf Banner for Mobile */
+      .elbaf-banner {
+        padding: 10px 14px;
+        margin-bottom: 12px;
+        gap: 8px;
+        flex-wrap: nowrap; /* Forces everything to stay in one row like desktop */
+      }
+      .elbaf-banner-icon {
+        font-size: 20px;
+      }
+      .elbaf-banner-text {
+        flex: 1; /* Lets the text take up the middle space and wrap safely */
+      }
+      .elbaf-banner-sub {
+        font-size: 11px; /* Keeps your lore visible! */
+        line-height: 1.3;
+      }
+      .elbaf-countdown {
+        padding: 6px 10px;
+        margin-left: auto; /* Locks it to the far right */
+        flex-shrink: 0; /* Prevents the box from ever getting squished */
+        min-width: 75px;
+      }
+
+      /* NEW: Compact Progress Hero for Mobile */
+      .progress-hero {
+        padding: 18px 14px 38px 14px;
+        margin-bottom: 16px;
+      }
+      .progress-hero-inner {
+        gap: 12px; /* Brings the episode number and title closer together */
+      }
+      .big-ep {
+        font-size: 52px; /* Shrinks the giant episode number slightly */
+      }
       .progress-hero-inner { justify-content: center; text-align: center; }
       .arc-item             { grid-template-columns: 1fr auto; }
       .arc-progress-mini    { display: block; width: 52px; }  /* kept visible on mobile */
@@ -1490,7 +1559,8 @@
       footer                { justify-content: center; }
       /* NEW: Make Share Button even smaller on mobile */
       .share-btn {
-        top: 10px;
+        top: auto;
+        bottom: 10px;
         right: 10px;
         padding: 3px 7px;
         font-size: 7px;
@@ -2103,8 +2173,17 @@ function renderHero() {
   const arc = getCurrentArc(ep);
   const pct = Math.min(100, Math.round(ep / tot * 100));
 
+  // NEW: Calculate the Arc + Saga text
+  let arcText = '—';
+  if (ep === 0) {
+    arcText = 'Set sail!';
+  } else if (arc) {
+    const displaySaga = arc.saga.endsWith('Saga') ? arc.saga : arc.saga + ' Saga';
+    arcText = `${arc.name} (${displaySaga})`;
+  }
+
   document.getElementById('currentEpDisplay').textContent = ep;
-  document.getElementById('currentArcName').textContent   = arc ? arc.name : (ep === 0 ? 'Set sail!' : '—');
+  document.getElementById('currentArcName').textContent   = arcText;
   document.getElementById('epFraction').textContent       = `${ep} / ${tot}`;
   document.getElementById('mainBar').style.width          = pct + '%';
   document.getElementById('mainPct').textContent          = `${pct}% of ${tot} episodes sailed`;
@@ -2464,17 +2543,31 @@ function renderMovieGrid() {
   if (!grid) return; 
   grid.innerHTML = '';
   
-  for (const m of MOVIES) {
+  // NEW: Grab the search query
+  const query = state.searchQuery.toLowerCase().trim();
+  
+  // NEW: Filter movies based on the search query
+  const filteredMovies = MOVIES.filter(m => {
+    if (query && !m.name.toLowerCase().includes(query)) return false;
+    return true;
+  });
+
+  // NEW: Show a "No results" message if nothing matches
+  if (filteredMovies.length === 0) {
+    grid.innerHTML = '<div class="no-results">🌊 No movies match your search.</div>';
+    return;
+  }
+
+  // Loop through the FILTERED movies instead of all movies
+  for (const m of filteredMovies) {
     const st = state.watchedMovies.has(m.id) ? 'watched' : 'unwatched';
     
-    // Restore the recommendation tags (Highly Recommended, Skip, etc.)
     const recLabel = m.rec === 'high' ? '⭐ Highly Recommended' : m.rec === 'watch' ? '👍 Worth Watching' : '⏭ Skip/Recap';
     const recClass = 'tag-base ' + (m.rec === 'high' ? 'rec-high' : m.rec === 'watch' ? 'rec-watch' : 'rec-skip');
     
     const div = document.createElement('div'); 
     div.className = `movie-item ${st}`;
-    
-    // Inject the "Best after Ep" text directly into the subtitle so mobile never hides it
+
     div.innerHTML = `
       <div class="movie-meta">
         <div class="movie-title-row">
@@ -2645,13 +2738,38 @@ function notifyAfterSet(result) {
     showToast(`⚠️ ${result.reason}`, '');
     return;
   }
+
+  const oldArc = getCurrentArc(result.oldEp);
+  const newArc = getCurrentArc(result.newEp);
+  
+  // Did we cross into a different arc? (Handles Ep 0 -> 1 as well!)
+  const enteredNewArc = newArc && (!oldArc || newArc.name !== oldArc.name) && result.newEp > result.oldEp;
+
+  // 1. Did they land exactly on the LAST episode of an arc? (e.g., Ep 2 -> 3)
+  if (result.milestones.length > 0 && result.newEp === arcEnd(result.milestones[result.milestones.length - 1])) {
+    const last = result.milestones[result.milestones.length - 1];
+    const f    = last.type === 'filler';
+    showToast(`${f ? '🟣' : '🎉'} ${f ? 'Filler' : 'Arc'} Complete: ${last.name}!`, f ? 'filler' : '');
+    return;
+  }
+  
+  // 2. Did they enter the FIRST episode of a new arc? (e.g., Ep 3 -> 4)
+  if (enteredNewArc) {
+    const f = newArc.type === 'filler';
+    showToast(`⚡ Entered ${newArc.name} Arc!`, f ? 'filler' : '');
+    return;
+  }
+  
+  // 3. Fallback: If they jumped 50 episodes at once and completed arcs along the way
   if (result.milestones.length > 0) {
     const last = result.milestones[result.milestones.length - 1];
     const f    = last.type === 'filler';
     showToast(`${f ? '🟣' : '🎉'} ${f ? 'Filler' : 'Arc'} Complete: ${last.name}!`, f ? 'filler' : '');
-  } else {
-    showToast(`⚓ Episode ${result.newEp} set!`, '');
+    return;
   }
+  
+  // 4. Standard episode update (e.g., Ep 4 -> 5)
+  showToast(`⚓ Episode ${result.newEp} set!`, '');
 }
 
 function notifyAtMax() {
@@ -2715,6 +2833,7 @@ function handleSearch() {
   const clearBtn          = document.getElementById('searchClear');
   clearBtn.classList.toggle('visible', input.value.length > 0);
   renderArcGrid();
+  renderMovieGrid();
 }
 
 function clearSearch() {
@@ -2724,6 +2843,7 @@ function clearSearch() {
   document.getElementById('searchClear').classList.remove('visible');
   input.focus();
   renderArcGrid();
+  renderMovieGrid();
 }
 
 function saveNotes() {
