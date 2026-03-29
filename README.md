@@ -17,7 +17,7 @@ Built by **Karan**.
 I wanted a lightweight, custom solution for my fresh rewatch of the series, without relying on bloated tracking sites or heavy web frameworks. 
 
 * **Tech Stack:** 100% Vanilla Web Technologies—just HTML, CSS (utilizing modern CSS variables and flex/grid layouts), and JavaScript. 
-* **AI Collaboration:** I architected and built this app by leveraging AI.
+* **AI Collaboration:** I used AI for the coding.
 * **Deployment:** Hosted seamlessly via GitHub Pages.
 
 ## ⚓ Installation 
